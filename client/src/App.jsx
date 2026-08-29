@@ -1,12 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 import RegisterStudent from './components/RegisterStudent'
 import StudentsList from './components/StudentsList'
 import QRScanner from './components/QRScanner'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 function App() {
   const [activePage, setActivePage] = useState('Dashboard')
+  const [studentCount, setStudentCount] = useState(0)
+  const [dashboardLoading, setDashboardLoading] = useState(false)
 
   const navigation = [
     { name: 'Dashboard', icon: '🏠' },
@@ -16,21 +20,50 @@ function App() {
     { name: 'Attendance', icon: '📋' },
   ]
 
+  const fetchStudentCount = async () => {
+    try {
+      setDashboardLoading(true)
+
+      const response = await fetch(`${API_URL}/api/students`)
+
+      if (!response.ok) {
+        throw new Error('Failed to load students')
+      }
+
+      const data = await response.json()
+
+      setStudentCount(data.length)
+    } catch (error) {
+      console.error('Error loading student count:', error)
+    } finally {
+      setDashboardLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchStudentCount()
+  }, [])
+
+  const handleStudentRegistered = (student) => {
+    console.log('Student registered:', student)
+
+    // Update dashboard immediately after registration
+    fetchStudentCount()
+  }
+
   const renderPage = () => {
     switch (activePage) {
       case 'Register Student':
         return (
           <RegisterStudent
-            onStudentRegistered={(student) => {
-              console.log('Student registered:', student)
-            }}
+            onStudentRegistered={handleStudentRegistered}
             onBack={() => setActivePage('Students')}
           />
         )
 
       case 'Scan Attendance':
-  return <QRScanner />
-          
+        return <QRScanner />
+
       case 'Students':
         return (
           <StudentsList
@@ -59,7 +92,14 @@ function App() {
         )
 
       default:
-        return <Dashboard onNavigate={setActivePage} />
+        return (
+          <Dashboard
+            onNavigate={setActivePage}
+            studentCount={studentCount}
+            loading={dashboardLoading}
+            onRefresh={fetchStudentCount}
+          />
+        )
     }
   }
 
@@ -145,7 +185,12 @@ function App() {
 
 /* DASHBOARD */
 
-function Dashboard({ onNavigate }) {
+function Dashboard({
+  onNavigate,
+  studentCount,
+  loading,
+  onRefresh,
+}) {
   return (
     <>
       <div className="welcome-section">
@@ -158,8 +203,12 @@ function Dashboard({ onNavigate }) {
           </p>
         </div>
 
-        <button className="secondary-button">
-          Refresh
+        <button
+          className="secondary-button"
+          onClick={onRefresh}
+          disabled={loading}
+        >
+          {loading ? 'Refreshing...' : 'Refresh'}
         </button>
 
       </div>
@@ -175,7 +224,7 @@ function Dashboard({ onNavigate }) {
 
           <div>
             <span>Total Students</span>
-            <strong>0</strong>
+            <strong>{studentCount}</strong>
           </div>
 
         </div>
