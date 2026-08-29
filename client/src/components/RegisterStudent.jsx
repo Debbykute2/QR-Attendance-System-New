@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 function RegisterStudent({ onStudentRegistered, onBack }) {
   const [formData, setFormData] = useState({
     student_id: '',
@@ -11,6 +13,7 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
 
   const [registeredStudent, setRegisteredStudent] = useState(null)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({
@@ -19,7 +22,7 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -33,34 +36,35 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
       return
     }
 
-    // Temporary frontend registration.
-    // We will connect this to the backend later.
-    const student = {
-      ...formData,
-      qrValue: JSON.stringify({
-        student_id: formData.student_id,
-      }),
-    }
+    try {
+      setLoading(true)
 
-    const existingStudents =
-  JSON.parse(localStorage.getItem('qr_students')) || []
+      const response = await fetch(`${API_URL}/api/students`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
 
-const updatedStudents = [
-  ...existingStudents.filter(
-    (item) => item.student_id !== student.student_id
-  ),
-  student,
-]
+      const data = await response.json()
 
-localStorage.setItem(
-  'qr_students',
-  JSON.stringify(updatedStudents)
-)
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to register student.')
+      }
 
-    setRegisteredStudent(student)
+      const student = data.student
 
-    if (onStudentRegistered) {
-      onStudentRegistered(student)
+      setRegisteredStudent(student)
+
+      if (onStudentRegistered) {
+        onStudentRegistered(student)
+      }
+    } catch (err) {
+      console.error('Registration error:', err)
+      setError(err.message || 'Failed to register student.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -73,6 +77,7 @@ localStorage.setItem(
       <div className="page-panel">
         <div className="success-message">
           <div className="success-icon">✓</div>
+
           <div>
             <h2>Student Registered Successfully!</h2>
             <p>
@@ -84,6 +89,7 @@ localStorage.setItem(
         <div className="qr-card" id="qr-print-area">
           <div className="qr-card-header">
             <div className="qr-logo">QR</div>
+
             <div>
               <h2>QR Attendance</h2>
               <p>Student Attendance Card</p>
@@ -92,7 +98,9 @@ localStorage.setItem(
 
           <div className="qr-code-wrapper">
             <QRCodeCanvas
-              value={registeredStudent.qrValue}
+              value={JSON.stringify({
+                student_id: registeredStudent.student_id,
+              })}
               size={220}
               level="H"
             />
@@ -123,11 +131,17 @@ localStorage.setItem(
         </div>
 
         <div className="qr-actions">
-          <button className="secondary-button" onClick={onBack}>
+          <button
+            className="secondary-button"
+            onClick={onBack}
+          >
             ← Back to Students
           </button>
 
-          <button className="primary-button" onClick={handlePrint}>
+          <button
+            className="primary-button"
+            onClick={handlePrint}
+          >
             🖨 Print QR Code
           </button>
         </div>
@@ -139,17 +153,29 @@ localStorage.setItem(
     <div className="page-panel">
       <div className="page-heading">
         <h2>Register New Student</h2>
+
         <p>
           Enter the student's information to create their attendance QR code.
         </p>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
 
-      <form className="student-form" onSubmit={handleSubmit}>
+      <form
+        className="student-form"
+        onSubmit={handleSubmit}
+      >
         <div className="form-grid">
+
           <div className="form-group">
-            <label htmlFor="student_id">Student ID</label>
+            <label htmlFor="student_id">
+              Student ID
+            </label>
+
             <input
               id="student_id"
               name="student_id"
@@ -157,11 +183,15 @@ localStorage.setItem(
               placeholder="e.g. STU001"
               value={formData.student_id}
               onChange={handleChange}
+              disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="name">Full Name</label>
+            <label htmlFor="name">
+              Full Name
+            </label>
+
             <input
               id="name"
               name="name"
@@ -169,11 +199,15 @@ localStorage.setItem(
               placeholder="Enter student's full name"
               value={formData.name}
               onChange={handleChange}
+              disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">
+              Email Address
+            </label>
+
             <input
               id="email"
               name="email"
@@ -181,11 +215,15 @@ localStorage.setItem(
               placeholder="student@example.com"
               value={formData.email}
               onChange={handleChange}
+              disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="department">Department</label>
+            <label htmlFor="department">
+              Department
+            </label>
+
             <input
               id="department"
               name="department"
@@ -193,22 +231,33 @@ localStorage.setItem(
               placeholder="Enter department"
               value={formData.department}
               onChange={handleChange}
+              disabled={loading}
             />
           </div>
+
         </div>
 
         <div className="form-actions">
+
           <button
             type="button"
             className="secondary-button"
             onClick={onBack}
+            disabled={loading}
           >
             Cancel
           </button>
 
-          <button type="submit" className="primary-button">
-            Generate QR & Register
+          <button
+            type="submit"
+            className="primary-button"
+            disabled={loading}
+          >
+            {loading
+              ? 'Registering...'
+              : 'Generate QR & Register'}
           </button>
+
         </div>
       </form>
     </div>
