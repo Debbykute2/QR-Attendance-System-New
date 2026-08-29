@@ -25,6 +25,7 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setLoading(true)
 
     if (
       !formData.student_id ||
@@ -33,12 +34,11 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
       !formData.department
     ) {
       setError('Please complete all fields.')
+      setLoading(false)
       return
     }
 
     try {
-      setLoading(true)
-
       const response = await fetch(`${API_URL}/api/students`, {
         method: 'POST',
         headers: {
@@ -53,16 +53,14 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
         throw new Error(data.message || 'Failed to register student.')
       }
 
-      const student = data.student
-
-      setRegisteredStudent(student)
+      setRegisteredStudent(data.student)
 
       if (onStudentRegistered) {
-        onStudentRegistered(student)
+        onStudentRegistered(data.student)
       }
-    } catch (err) {
-      console.error('Registration error:', err)
-      setError(err.message || 'Failed to register student.')
+    } catch (error) {
+      console.error('Registration error:', error)
+      setError(error.message || 'Failed to register student.')
     } finally {
       setLoading(false)
     }
@@ -103,6 +101,7 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               })}
               size={220}
               level="H"
+              includeMargin={true}
             />
           </div>
 
@@ -170,7 +169,6 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
         onSubmit={handleSubmit}
       >
         <div className="form-grid">
-
           <div className="form-group">
             <label htmlFor="student_id">
               Student ID
@@ -183,7 +181,6 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               placeholder="e.g. STU001"
               value={formData.student_id}
               onChange={handleChange}
-              disabled={loading}
             />
           </div>
 
@@ -199,7 +196,6 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               placeholder="Enter student's full name"
               value={formData.name}
               onChange={handleChange}
-              disabled={loading}
             />
           </div>
 
@@ -215,7 +211,6 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               placeholder="student@example.com"
               value={formData.email}
               onChange={handleChange}
-              disabled={loading}
             />
           </div>
 
@@ -231,19 +226,15 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               placeholder="Enter department"
               value={formData.department}
               onChange={handleChange}
-              disabled={loading}
             />
           </div>
-
         </div>
 
         <div className="form-actions">
-
           <button
             type="button"
             className="secondary-button"
             onClick={onBack}
-            disabled={loading}
           >
             Cancel
           </button>
@@ -257,7 +248,6 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               ? 'Registering...'
               : 'Generate QR & Register'}
           </button>
-
         </div>
       </form>
     </div>
