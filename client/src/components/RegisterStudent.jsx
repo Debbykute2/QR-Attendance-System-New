@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { QRCodeCanvas } from 'qrcode.react'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -95,15 +94,13 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
           </div>
 
           <div className="qr-code-wrapper">
-            <QRCodeCanvas
-              value={JSON.stringify({
-                student_id: registeredStudent.student_id,
-              })}
-              size={220}
-              level="H"
-              includeMargin={true}
-            />
-          </div>
+  <img
+    src={registeredStudent.qr_code}
+    alt={`QR Code for ${registeredStudent.student_id}`}
+    width="220"
+    height="220"
+  />
+</div>
 
           <div className="student-qr-details">
             <h2>{registeredStudent.name}</h2>
