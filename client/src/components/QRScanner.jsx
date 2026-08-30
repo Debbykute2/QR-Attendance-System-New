@@ -19,12 +19,14 @@ function QRScanner({ onAttendanceRecorded }) {
     const readerElement = document.getElementById("qr-reader");
 
     if (!readerElement) {
-      setError("Scanner area could not be found. Please refresh the page.");
+      setError(
+        "Scanner area could not be found. Please refresh the page."
+      );
       return;
     }
 
     try {
-      // Clear any previous scanner content
+      // Clear previous scanner content
       readerElement.innerHTML = "";
 
       const scanner = new Html5Qrcode("qr-reader");
@@ -39,8 +41,9 @@ function QRScanner({ onAttendanceRecorded }) {
             height: 250,
           },
         },
+
         async (decodedText) => {
-          // Prevent the same QR code from being processed multiple times
+          // Prevent multiple scans at the same time
           if (processingRef.current) {
             return;
           }
@@ -48,45 +51,133 @@ function QRScanner({ onAttendanceRecorded }) {
           processingRef.current = true;
 
           try {
-            await scanner.stop();
-            scanner.clear();
+            // Stop camera before sending attendance
+            try {
+              await scanner.stop();
+              scanner.clear();
+            } catch (stopError) {
+              console.log(
+                "Scanner stopped with message:",
+                stopError
+              );
+            }
+
             scannerRef.current = null;
             setScanning(false);
 
             console.log("QR Code scanned:", decodedText);
             console.log("Sending attendance to:", API_URL);
 
-            const response = await fetch(`${API_URL}/api/attendance`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                student_id: decodedText,
-              }),
-            });
+            // Check API URL
+            if (!API_URL) {
+              throw new Error(
+                "API URL is not configured. Please check VITE_API_URL."
+              );
+            }
 
-            const data = await response.json();
+            const response = await fetch(
+              `${API_URL}/api/attendance`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  student_id: decodedText,
+                }),
+              }
+            );
+
+            // Safely read response
+            let data = {};
+
+            try {
+              data = await response.json();
+            } catch (jsonError) {
+              console.error(
+                "Could not read server response:",
+                jsonError
+              );
+            }
 
             console.log("Attendance response:", data);
+            console.log("Response status:", response.status);
 
+            // =========================
+            // DUPLICATE ATTENDANCE
+            // =========================
+            if (response.status === 409) {
+              setMessage(
+                data.message ||
+                  "Attendance already recorded for today."
+              );
+
+              setError("");
+
+              // Allow another scan later
+              processingRef.current = false;
+
+              return;
+            }
+
+            // =========================
+            // STUDENT NOT FOUND
+            // =========================
+            if (response.status === 404) {
+              setError(
+                data.message ||
+                  "Student not found."
+              );
+
+              setMessage("");
+              processingRef.current = false;
+
+              return;
+            }
+
+            // =========================
+            // OTHER SERVER ERRORS
+            // =========================
             if (!response.ok) {
               throw new Error(
                 data.message ||
                   data.error ||
-                  "Unable to record attendance."
+                  `Server error (${response.status}).`
               );
             }
 
+            // =========================
+            // SUCCESS
+            // =========================
             setMessage(
               data.message ||
                 "Attendance recorded successfully!"
             );
 
-            // Refresh attendance records in App.jsx
+            setError("");
+
+            /*
+              Refresh the attendance list separately.
+
+              IMPORTANT:
+              If refreshing the list fails, we DO NOT
+              want to tell the user that attendance failed.
+              The attendance has already been saved.
+            */
             if (onAttendanceRecorded) {
-              await onAttendanceRecorded();
+              try {
+                await onAttendanceRecorded();
+              } catch (refreshError) {
+                console.error(
+                  "Attendance list refresh failed:",
+                  refreshError
+                );
+              }
             }
+
+            // Allow another scan
+            processingRef.current = false;
+
           } catch (err) {
             console.error("Attendance error:", err);
 
@@ -95,15 +186,19 @@ function QRScanner({ onAttendanceRecorded }) {
                 "Failed to record attendance."
             );
 
+            setMessage("");
+
             processingRef.current = false;
           }
         },
+
         () => {
           // Ignore QR scanning errors while camera is running
         }
       );
 
       setScanning(true);
+
     } catch (err) {
       console.error("Camera error:", err);
 
@@ -111,7 +206,9 @@ function QRScanner({ onAttendanceRecorded }) {
 
       if (
         err.name === "NotAllowedError" ||
-        String(err).toLowerCase().includes("permission")
+        String(err)
+          .toLowerCase()
+          .includes("permission")
       ) {
         setError(
           "Camera permission was denied. Please allow camera access in your browser settings."
@@ -132,7 +229,10 @@ function QRScanner({ onAttendanceRecorded }) {
         scannerRef.current = null;
       }
     } catch (err) {
-      console.error("Error stopping scanner:", err);
+      console.error(
+        "Error stopping scanner:",
+        err
+      );
     }
 
     processingRef.current = false;
@@ -144,8 +244,8 @@ function QRScanner({ onAttendanceRecorded }) {
       <h2>Scan Attendance</h2>
 
       <p>
-        Click <strong>Start Camera</strong> and point the camera
-        at a student's QR code.
+        Click <strong>Start Camera</strong> and point
+        the camera at a student's QR code.
       </p>
 
       <div
@@ -176,7 +276,12 @@ function QRScanner({ onAttendanceRecorded }) {
 
       {message && (
         <div className="success-message">
-          ✅ {message}
+          {message.includes("already") ||
+          message.includes("today") ? (
+            <>⚠️ {message}</>
+          ) : (
+            <>✅ {message}</>
+          )}
         </div>
       )}
 
