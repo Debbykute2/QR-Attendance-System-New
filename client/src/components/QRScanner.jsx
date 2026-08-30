@@ -3,18 +3,19 @@ import { Html5Qrcode } from "html5-qrcode";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function QRScanner() {
+function QRScanner({ onAttendanceRecorded }) {
   const [scanning, setScanning] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const scannerRef = useRef(null);
+  const processingRef = useRef(false);
 
   const startScanner = async () => {
     setMessage("");
     setError("");
+    processingRef.current = false;
 
-    // Make sure the QR reader element exists
     const readerElement = document.getElementById("qr-reader");
 
     if (!readerElement) {
@@ -23,6 +24,9 @@ function QRScanner() {
     }
 
     try {
+      // Clear any previous scanner content
+      readerElement.innerHTML = "";
+
       const scanner = new Html5Qrcode("qr-reader");
       scannerRef.current = scanner;
 
@@ -30,15 +34,27 @@ function QRScanner() {
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
+          qrbox: {
+            width: 250,
+            height: 250,
+          },
         },
         async (decodedText) => {
-          // QR code successfully scanned
+          // Prevent the same QR code from being processed multiple times
+          if (processingRef.current) {
+            return;
+          }
+
+          processingRef.current = true;
+
           try {
             await scanner.stop();
             scanner.clear();
             scannerRef.current = null;
             setScanning(false);
+
+            console.log("QR Code scanned:", decodedText);
+            console.log("Sending attendance to:", API_URL);
 
             const response = await fetch(`${API_URL}/api/attendance`, {
               method: "POST",
@@ -52,16 +68,34 @@ function QRScanner() {
 
             const data = await response.json();
 
-            if (response.ok) {
-              setMessage(
-                data.message || "Attendance recorded successfully!"
+            console.log("Attendance response:", data);
+
+            if (!response.ok) {
+              throw new Error(
+                data.message ||
+                  data.error ||
+                  "Unable to record attendance."
               );
-            } else {
-              setError(data.error || "Unable to record attendance.");
+            }
+
+            setMessage(
+              data.message ||
+                "Attendance recorded successfully!"
+            );
+
+            // Refresh attendance records in App.jsx
+            if (onAttendanceRecorded) {
+              await onAttendanceRecorded();
             }
           } catch (err) {
-            console.error(err);
-            setError("Failed to record attendance.");
+            console.error("Attendance error:", err);
+
+            setError(
+              err.message ||
+                "Failed to record attendance."
+            );
+
+            processingRef.current = false;
           }
         },
         () => {
@@ -72,6 +106,8 @@ function QRScanner() {
       setScanning(true);
     } catch (err) {
       console.error("Camera error:", err);
+
+      processingRef.current = false;
 
       if (
         err.name === "NotAllowedError" ||
@@ -99,6 +135,7 @@ function QRScanner() {
       console.error("Error stopping scanner:", err);
     }
 
+    processingRef.current = false;
     setScanning(false);
   };
 
@@ -107,11 +144,10 @@ function QRScanner() {
       <h2>Scan Attendance</h2>
 
       <p>
-        Click <strong>Start Camera</strong> and point the camera at a student's
-        QR code.
+        Click <strong>Start Camera</strong> and point the camera
+        at a student's QR code.
       </p>
 
-      {/* Scanner area */}
       <div
         id="qr-reader"
         style={{
@@ -123,11 +159,17 @@ function QRScanner() {
       ></div>
 
       {!scanning ? (
-        <button onClick={startScanner} className="start-camera-btn">
+        <button
+          onClick={startScanner}
+          className="start-camera-btn"
+        >
           📷 Start Camera
         </button>
       ) : (
-        <button onClick={stopScanner} className="stop-camera-btn">
+        <button
+          onClick={stopScanner}
+          className="stop-camera-btn"
+        >
           ⏹ Stop Camera
         </button>
       )}

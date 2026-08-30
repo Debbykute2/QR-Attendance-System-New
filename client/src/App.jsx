@@ -10,7 +10,10 @@ const API_URL = import.meta.env.VITE_API_URL
 function App() {
   const [activePage, setActivePage] = useState('Dashboard')
   const [studentCount, setStudentCount] = useState(0)
+  const [attendanceRecords, setAttendanceRecords] = useState([])
   const [dashboardLoading, setDashboardLoading] = useState(false)
+  const [attendanceLoading, setAttendanceLoading] = useState(false)
+  const [attendanceError, setAttendanceError] = useState('')
 
   const navigation = [
     { name: 'Dashboard', icon: '🏠' },
@@ -20,10 +23,12 @@ function App() {
     { name: 'Attendance', icon: '📋' },
   ]
 
+  // =========================
+  // LOAD STUDENTS
+  // =========================
+
   const fetchStudentCount = async () => {
     try {
-      setDashboardLoading(true)
-
       const response = await fetch(`${API_URL}/api/students`)
 
       if (!response.ok) {
@@ -35,21 +40,114 @@ function App() {
       setStudentCount(data.length)
     } catch (error) {
       console.error('Error loading student count:', error)
+    }
+  }
+
+  // =========================
+  // LOAD ATTENDANCE
+  // =========================
+
+  const fetchAttendance = async () => {
+    try {
+      setAttendanceLoading(true)
+      setAttendanceError('')
+
+      const response = await fetch(`${API_URL}/api/attendance`)
+
+      if (!response.ok) {
+        throw new Error('Failed to load attendance records')
+      }
+
+      const data = await response.json()
+
+      setAttendanceRecords(data)
+    } catch (error) {
+      console.error('Error loading attendance:', error)
+      setAttendanceError('Unable to load attendance records.')
+    } finally {
+      setAttendanceLoading(false)
+    }
+  }
+
+  // =========================
+  // LOAD DASHBOARD DATA
+  // =========================
+
+  const refreshDashboard = async () => {
+    try {
+      setDashboardLoading(true)
+
+      await Promise.all([
+        fetchStudentCount(),
+        fetchAttendance(),
+      ])
     } finally {
       setDashboardLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchStudentCount()
+    refreshDashboard()
   }, [])
+
+  // =========================
+  // AFTER REGISTRATION
+  // =========================
 
   const handleStudentRegistered = (student) => {
     console.log('Student registered:', student)
 
-    // Update dashboard immediately after registration
     fetchStudentCount()
   }
+
+  // =========================
+  // AFTER SCANNING
+  // =========================
+
+  const handleAttendanceRecorded = async () => {
+  await fetchAttendance()
+}
+
+  // =========================
+  // CALCULATE TODAY'S ATTENDANCE
+  // =========================
+
+  const today = new Date()
+
+  const presentTodayRecords = attendanceRecords.filter((record) => {
+    if (!record.attendance_time) {
+      return false
+    }
+
+    const attendanceDate = new Date(record.attendance_time)
+
+    return (
+      attendanceDate.getFullYear() === today.getFullYear() &&
+      attendanceDate.getMonth() === today.getMonth() &&
+      attendanceDate.getDate() === today.getDate()
+    )
+  })
+
+  // Count unique students who attended today
+  const presentStudentIds = new Set(
+    presentTodayRecords.map((record) => record.student_id)
+  )
+
+  const presentToday = presentStudentIds.size
+
+  const absentToday = Math.max(
+    studentCount - presentToday,
+    0
+  )
+
+  const attendanceRate =
+    studentCount > 0
+      ? Math.round((presentToday / studentCount) * 100)
+      : 0
+
+  // =========================
+  // PAGE RENDERING
+  // =========================
 
   const renderPage = () => {
     switch (activePage) {
@@ -62,7 +160,11 @@ function App() {
         )
 
       case 'Scan Attendance':
-        return <QRScanner />
+        return (
+          <QRScanner
+            onAttendanceRecorded={handleAttendanceRecorded}
+          />
+        )
 
       case 'Students':
         return (
@@ -73,22 +175,12 @@ function App() {
 
       case 'Attendance':
         return (
-          <div className="page-panel">
-            <div className="page-heading">
-              <h2>Attendance Records</h2>
-              <p>View student attendance records.</p>
-            </div>
-
-            <div className="table-container">
-              <div className="table-empty">
-                <span>📋</span>
-                <strong>No attendance records</strong>
-                <p>
-                  Attendance records will appear here after students check in.
-                </p>
-              </div>
-            </div>
-          </div>
+          <AttendancePage
+            records={attendanceRecords}
+            loading={attendanceLoading}
+            error={attendanceError}
+            onRefresh={fetchAttendance}
+          />
         )
 
       default:
@@ -96,8 +188,12 @@ function App() {
           <Dashboard
             onNavigate={setActivePage}
             studentCount={studentCount}
+            presentToday={presentToday}
+            absentToday={absentToday}
+            attendanceRate={attendanceRate}
+            attendanceRecords={attendanceRecords}
             loading={dashboardLoading}
-            onRefresh={fetchStudentCount}
+            onRefresh={refreshDashboard}
           />
         )
     }
@@ -183,14 +279,22 @@ function App() {
 }
 
 
-/* DASHBOARD */
+/* =========================
+   DASHBOARD
+   ========================= */
 
 function Dashboard({
   onNavigate,
   studentCount,
+  presentToday,
+  absentToday,
+  attendanceRate,
+  attendanceRecords,
   loading,
   onRefresh,
 }) {
+  const recentAttendance = attendanceRecords.slice(0, 5)
+
   return (
     <>
       <div className="welcome-section">
@@ -213,6 +317,8 @@ function Dashboard({
 
       </div>
 
+
+      {/* STATISTICS */}
 
       <div className="stats-grid">
 
@@ -238,7 +344,7 @@ function Dashboard({
 
           <div>
             <span>Present Today</span>
-            <strong>0</strong>
+            <strong>{presentToday}</strong>
           </div>
 
         </div>
@@ -252,7 +358,7 @@ function Dashboard({
 
           <div>
             <span>Absent Today</span>
-            <strong>0</strong>
+            <strong>{absentToday}</strong>
           </div>
 
         </div>
@@ -266,7 +372,7 @@ function Dashboard({
 
           <div>
             <span>Attendance Rate</span>
-            <strong>0%</strong>
+            <strong>{attendanceRate}%</strong>
           </div>
 
         </div>
@@ -296,19 +402,76 @@ function Dashboard({
 
           </div>
 
-          <div className="empty-state">
+          {recentAttendance.length === 0 ? (
 
-            <div className="empty-icon">
-              📋
+            <div className="empty-state">
+
+              <div className="empty-icon">
+                📋
+              </div>
+
+              <h3>No attendance records</h3>
+
+              <p>
+                Attendance records will appear here after students check in.
+              </p>
+
             </div>
 
-            <h3>No attendance records</h3>
+          ) : (
 
-            <p>
-              Attendance records will appear here after students check in.
-            </p>
+            <div className="table-container">
 
-          </div>
+              <table>
+
+                <thead>
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Department</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+
+                  {recentAttendance.map((record) => (
+
+                    <tr key={record.id}>
+
+                      <td>
+                        {record.student_id}
+                      </td>
+
+                      <td>
+                        <strong>
+                          {record.name}
+                        </strong>
+                      </td>
+
+                      <td>
+                        {record.department}
+                      </td>
+
+                      <td>
+                        {record.attendance_time
+                          ? new Date(
+                              record.attendance_time
+                            ).toLocaleString()
+                          : '-'}
+                      </td>
+
+                    </tr>
+
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          )}
 
         </div>
 
@@ -364,6 +527,148 @@ function Dashboard({
 
       </div>
     </>
+  )
+}
+
+
+/* =========================
+   ATTENDANCE PAGE
+   ========================= */
+
+function AttendancePage({
+  records,
+  loading,
+  error,
+  onRefresh,
+}) {
+  return (
+    <div className="page-panel">
+
+      <div className="page-heading-row">
+
+        <div className="page-heading">
+
+          <h2>Attendance Records</h2>
+
+          <p>
+            View all student attendance records.
+          </p>
+
+        </div>
+
+        <button
+          className="secondary-button"
+          onClick={onRefresh}
+          disabled={loading}
+        >
+          {loading ? 'Refreshing...' : 'Refresh'}
+        </button>
+
+      </div>
+
+
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+
+      {loading ? (
+
+        <div className="table-empty">
+
+          <span>⏳</span>
+
+          <strong>
+            Loading attendance records...
+          </strong>
+
+          <p>
+            Please wait while the records are loaded.
+          </p>
+
+        </div>
+
+      ) : records.length === 0 ? (
+
+        <div className="table-empty">
+
+          <span>📋</span>
+
+          <strong>
+            No attendance records
+          </strong>
+
+          <p>
+            Attendance records will appear here after students check in.
+          </p>
+
+        </div>
+
+      ) : (
+
+        <div className="table-container">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Student ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Attendance Time</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {records.map((record) => (
+
+                <tr key={record.id}>
+
+                  <td>
+                    {record.student_id}
+                  </td>
+
+                  <td>
+                    <strong>
+                      {record.name}
+                    </strong>
+                  </td>
+
+                  <td>
+                    {record.email}
+                  </td>
+
+                  <td>
+                    {record.department}
+                  </td>
+
+                  <td>
+                    {record.attendance_time
+                      ? new Date(
+                          record.attendance_time
+                        ).toLocaleString()
+                      : '-'}
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      )}
+
+    </div>
   )
 }
 
