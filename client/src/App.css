@@ -2,6 +2,26 @@
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
 button,
 input {
   font: inherit;
@@ -11,15 +31,19 @@ button {
   cursor: pointer;
 }
 
+/* =========================================================
+   APP
+   ========================================================= */
+
 .app {
   min-height: 100vh;
   display: flex;
   background: #f5f7fb;
 }
 
-/* =========================
+/* =========================================================
    SIDEBAR
-   ========================= */
+   ========================================================= */
 
 .sidebar {
   width: 260px;
@@ -32,6 +56,7 @@ button {
   left: 0;
   top: 0;
   bottom: 0;
+  z-index: 100;
 }
 
 .brand {
@@ -52,6 +77,7 @@ button {
   justify-content: center;
   font-weight: 800;
   font-size: 16px;
+  flex-shrink: 0;
 }
 
 .brand h2 {
@@ -125,9 +151,9 @@ button {
   text-align: center;
 }
 
-/* =========================
+/* =========================================================
    MAIN CONTENT
-   ========================= */
+   ========================================================= */
 
 .main-content {
   width: calc(100% - 260px);
@@ -174,6 +200,7 @@ button {
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  font-size: 11px;
 }
 
 .user-profile strong {
@@ -195,28 +222,9 @@ button {
   margin: auto;
 }
 
-/* =========================
-   DASHBOARD
-   ========================= */
-
-.welcome-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 25px;
-}
-
-.welcome-section h2 {
-  margin: 0 0 5px;
-  font-size: 21px;
-  color: #111827;
-}
-
-.welcome-section p {
-  color: #6b7280;
-  margin: 0;
-  font-size: 13px;
-}
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
 .primary-button,
 .secondary-button {
@@ -253,6 +261,29 @@ button {
   background: #f9fafb;
 }
 
+/* =========================================================
+   DASHBOARD
+   ========================================================= */
+
+.welcome-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.welcome-section h2 {
+  margin: 0 0 5px;
+  font-size: 21px;
+  color: #111827;
+}
+
+.welcome-section p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 13px;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -279,6 +310,7 @@ button {
   justify-content: center;
   font-size: 20px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .students-icon {
@@ -385,6 +417,10 @@ button {
   max-width: 280px;
 }
 
+/* =========================================================
+   QUICK ACTIONS
+   ========================================================= */
+
 .action-button {
   width: 100%;
   display: flex;
@@ -411,6 +447,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .action-button div {
@@ -434,9 +471,9 @@ button {
   color: #9ca3af;
 }
 
-/* =========================
+/* =========================================================
    PAGES
-   ========================= */
+   ========================================================= */
 
 .page-panel {
   padding: 28px;
@@ -464,9 +501,9 @@ button {
   align-items: center;
 }
 
-/* =========================
+/* =========================================================
    FORM
-   ========================= */
+   ========================================================= */
 
 .student-form {
   max-width: 850px;
@@ -494,6 +531,7 @@ button {
   padding: 0 13px;
   color: #111827;
   outline: none;
+  background: #ffffff;
 }
 
 .form-group input:focus {
@@ -512,9 +550,9 @@ button {
   margin-top: 30px;
 }
 
-/* =========================
+/* =========================================================
    SUCCESS / ERROR
-   ========================= */
+   ========================================================= */
 
 .success-message {
   display: flex;
@@ -563,138 +601,9 @@ button {
   margin-bottom: 20px;
 }
 
-/* =========================
-   QR CARD
-   ========================= */
-
-.qr-card {
-  width: 390px;
-  max-width: 100%;
-  margin: 0 auto;
-  background: #ffffff;
-  border: 1px solid #dbe2ea;
-  border-radius: 14px;
-  padding: 25px;
-  text-align: center;
-  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
-}
-
-.qr-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.qr-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: #2563eb;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-}
-
-.qr-card-header h2 {
-  margin: 0;
-  font-size: 17px;
-  color: #111827;
-}
-
-.qr-card-header p {
-  margin: 2px 0 0;
-  font-size: 10px;
-  color: #6b7280;
-}
-
-/* =========================
-   QR CODE
-   ========================= */
-
-.qr-code-wrapper {
-  padding: 25px 0 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.qr-code-wrapper canvas {
-  width: 220px !important;
-  height: 220px !important;
-  max-width: 100%;
-  display: block;
-}
-
-.qr-code-wrapper img {
-  width: 220px;
-  height: 220px;
-  max-width: 100%;
-  display: block;
-  object-fit: contain;
-}
-
-/* =========================
-   STUDENT DETAILS
-   ========================= */
-
-.student-qr-details {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 18px;
-}
-
-.student-qr-details h2 {
-  margin: 0 0 15px;
-  color: #111827;
-  font-size: 20px;
-}
-
-.student-detail {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  padding: 7px 0;
-  border-bottom: 1px solid #f1f5f9;
-  text-align: left;
-}
-
-.student-detail span {
-  color: #6b7280;
-  font-size: 11px;
-}
-
-.student-detail strong {
-  color: #374151;
-  font-size: 11px;
-  text-align: right;
-  word-break: break-word;
-}
-
-.scan-instruction {
-  color: #6b7280;
-  font-size: 11px;
-  margin: 18px 0 0;
-}
-
-/* =========================
-   QR ACTION BUTTONS
-   ========================= */
-
-.qr-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 25px;
-  flex-wrap: wrap;
-}
-
-/* =========================
+/* =========================================================
    STUDENTS
-   ========================= */
+   ========================================================= */
 
 .student-count {
   background: #eff6ff;
@@ -745,9 +654,9 @@ button {
   background: #dbeafe;
 }
 
-/* =========================
+/* =========================================================
    TABLES
-   ========================= */
+   ========================================================= */
 
 .table-container {
   overflow-x: auto;
@@ -783,6 +692,10 @@ td {
   border-bottom: 1px solid #f1f5f9;
 }
 
+/* =========================================================
+   EMPTY TABLE
+   ========================================================= */
+
 .table-empty {
   min-height: 230px;
   display: flex;
@@ -808,9 +721,9 @@ td {
   margin: 5px 0 0;
 }
 
-/* =========================
+/* =========================================================
    QR MODAL
-   ========================= */
+   ========================================================= */
 
 .qr-modal-overlay {
   position: fixed;
@@ -854,16 +767,148 @@ td {
   background: #e5e7eb;
 }
 
-.qr-modal .qr-card {
-  box-shadow: none;
-  border: none;
-  padding: 10px;
-  width: 100%;
+/* =========================================================
+   QR CARD
+   ========================================================= */
+
+.qr-card {
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #dbe2ea;
+  border-radius: 14px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.08);
 }
 
-/* =========================
+.qr-modal .qr-card {
+  box-shadow: none;
+}
+
+.qr-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.qr-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.qr-card-header h2 {
+  margin: 0;
+  font-size: 17px;
+  color: #111827;
+}
+
+.qr-card-header p {
+  margin: 2px 0 0;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+/* =========================================================
+   QR CODE
+   ========================================================= */
+
+.qr-code-wrapper {
+  padding: 25px 0 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+}
+
+.qr-code-wrapper canvas {
+  width: 220px !important;
+  height: 220px !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+.qr-code-wrapper img {
+  width: 220px !important;
+  height: 220px !important;
+  max-width: none !important;
+  max-height: none !important;
+  display: block !important;
+  margin: 0 auto !important;
+  object-fit: contain !important;
+}
+
+/* =========================================================
+   STUDENT QR DETAILS
+   ========================================================= */
+
+.student-qr-details {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 18px;
+}
+
+.student-qr-details h2 {
+  margin: 0 0 15px;
+  color: #111827;
+  font-size: 20px;
+}
+
+.student-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 7px 0;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+}
+
+.student-detail span {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.student-detail strong {
+  color: #374151;
+  font-size: 11px;
+  text-align: right;
+  word-break: break-word;
+}
+
+.scan-instruction {
+  color: #6b7280;
+  font-size: 11px;
+  margin: 18px 0 0;
+}
+
+/* =========================================================
+   QR ACTIONS
+   ========================================================= */
+
+.qr-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
    SCANNER
-   ========================= */
+   ========================================================= */
 
 .scanner-page {
   min-height: 600px;
@@ -957,9 +1002,9 @@ td {
   background: #f9fafb;
 }
 
-/* =========================
+/* =========================================================
    REAL QR SCANNER
-   ========================= */
+   ========================================================= */
 
 #qr-reader {
   width: min(100%, 520px);
@@ -968,6 +1013,7 @@ td {
   border-radius: 12px;
   overflow: hidden;
   position: relative;
+  margin: 20px auto;
 }
 
 #qr-reader video {
@@ -1041,9 +1087,9 @@ td {
   font-size: 13px;
 }
 
-/* =========================
+/* =========================================================
    SCANNER PLACEHOLDER
-   ========================= */
+   ========================================================= */
 
 .scanner-placeholder {
   width: min(100%, 520px);
@@ -1083,9 +1129,9 @@ td {
   font-size: 13px;
 }
 
-/* =========================
+/* =========================================================
    RESPONSIVE
-   ========================= */
+   ========================================================= */
 
 @media (max-width: 1100px) {
   .stats-grid {
@@ -1232,11 +1278,6 @@ td {
     align-items: flex-start;
   }
 
-  .scanner-frame {
-    width: 190px;
-    height: 190px;
-  }
-
   .scanner-message {
     font-size: 12px;
   }
@@ -1247,86 +1288,125 @@ td {
 }
 
 /* =========================================================
-   PRINT QR CODE FROM STUDENTS VIEW PAGE
+   PRINTING
    ========================================================= */
 
 @media print {
-  /* A4 paper */
+
   @page {
-    size: A4;
-    margin: 15mm;
+    size: A4 portrait;
+    margin: 12mm;
   }
 
-  /* Reset page */
   html,
-  body {
-    width: 100%;
-    height: auto;
+  body,
+  #root {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
   }
 
-  /*
-    Hide the entire application.
-    Only #student-qr-print will become visible.
-  */
-  body * {
-    visibility: hidden !important;
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  /*
-    Show only the QR print area.
-  */
-  #student-qr-print,
-  #student-qr-print * {
-    visibility: visible !important;
+  /* =======================================================
+     HIDE APPLICATION UI
+     ======================================================= */
+
+  .sidebar,
+  .topbar,
+  .qr-actions,
+  .close-qr-button,
+  .student-search,
+  .student-count,
+  .page-heading,
+  .page-heading-row,
+  .table-container,
+  .table-empty,
+  .error-message {
+    display: none !important;
   }
 
-  /*
-    Remove modal restrictions while printing.
-  */
-  .qr-modal-overlay {
-    position: static !important;
+  /* =======================================================
+     KEEP APP CONTAINERS BUT REMOVE THEIR LAYOUT RESTRICTIONS
+     ======================================================= */
+
+  .app,
+  .main-content,
+  .content {
     display: block !important;
     width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
-    padding: 0 !important;
     margin: 0 !important;
-    background: transparent !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+  }
+
+  /* =======================================================
+     STUDENT QR MODAL
+     ======================================================= */
+
+  .qr-modal-overlay {
+    display: block !important;
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
     overflow: visible !important;
   }
 
   .qr-modal {
+    display: block !important;
     position: static !important;
     width: 100% !important;
     max-width: none !important;
-    max-height: none !important;
     height: auto !important;
-    padding: 0 !important;
+    max-height: none !important;
+    min-height: 0 !important;
     margin: 0 !important;
-    background: transparent !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 0 !important;
     box-shadow: none !important;
     overflow: visible !important;
-    border-radius: 0 !important;
   }
 
-  /*
-    Printable QR area.
-  */
-  #student-qr-print {
-    position: absolute !important;
+  /* =======================================================
+     IMPORTANT:
+     PRINT AREA MUST NOT HAVE A FIXED HEIGHT OR OVERFLOW
+     ======================================================= */
+
+  #student-qr-print,
+  #qr-print-area {
     display: block !important;
-    left: 50% !important;
-    top: 0 !important;
-    transform: translateX(-50%) !important;
+    visibility: visible !important;
 
-    width: 390px !important;
-    max-width: 390px !important;
+    position: static !important;
 
-    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+
+    margin: 0 auto !important;
     padding: 0 !important;
+
+    background: #ffffff !important;
 
     overflow: visible !important;
 
@@ -1334,15 +1414,27 @@ td {
     break-inside: avoid !important;
   }
 
-  /*
-    Complete QR card.
-  */
-  #student-qr-print .qr-card {
+  #student-qr-print *,
+  #qr-print-area * {
+    visibility: visible !important;
+  }
+
+  /* =======================================================
+     QR CARD
+     ======================================================= */
+
+  #student-qr-print .qr-card,
+  #qr-print-area .qr-card {
+    display: block !important;
+
+    position: static !important;
+
     width: 390px !important;
     max-width: 390px !important;
     min-width: 390px !important;
 
     height: auto !important;
+    max-height: none !important;
     min-height: 0 !important;
 
     margin: 0 auto !important;
@@ -1361,89 +1453,282 @@ td {
     break-inside: avoid !important;
   }
 
-  /*
-    QR code container.
-  */
-  #student-qr-print .qr-code-wrapper {
+  /* =======================================================
+     QR HEADER
+     ======================================================= */
+
+  #student-qr-print .qr-card-header,
+  #qr-print-area .qr-card-header {
+    display: flex !important;
+
     width: 100% !important;
     height: auto !important;
+    min-height: 0 !important;
 
-    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 
+    padding-bottom: 18px !important;
+    margin: 0 !important;
+
+    border-bottom: 1px solid #e5e7eb !important;
+
+    overflow: visible !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #student-qr-print .qr-logo,
+  #qr-print-area .qr-logo {
+    display: flex !important;
+
+    width: 40px !important;
+    min-width: 40px !important;
+
+    height: 40px !important;
+    min-height: 40px !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #2563eb !important;
+    color: #ffffff !important;
+
+    visibility: visible !important;
+  }
+
+  /* =======================================================
+     CRITICAL QR CODE FIX
+     ======================================================= */
+
+  #student-qr-print .qr-code-wrapper,
+  #qr-print-area .qr-code-wrapper {
+    display: flex !important;
+
+    position: static !important;
+
+    width: 100% !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
     padding: 25px 0 18px !important;
+    margin: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #ffffff !important;
+
+    overflow: visible !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /*
+     Do NOT use height: 250px here.
+     The canvas is exactly 220px high and must have
+     enough unrestricted space around it.
+  */
+
+  #student-qr-print .qr-code-wrapper canvas,
+  #qr-print-area .qr-code-wrapper canvas {
+    display: block !important;
+
+    position: static !important;
+
+    width: 220px !important;
+    height: 220px !important;
+
+    min-width: 220px !important;
+    min-height: 220px !important;
+
+    max-width: 220px !important;
+    max-height: 220px !important;
+
+    flex: 0 0 220px !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    visibility: visible !important;
 
     overflow: visible !important;
   }
 
-  /*
-    Make the complete QR code print at 220 x 220.
-  */
-  #student-qr-print .qr-code-wrapper canvas {
+  #student-qr-print .qr-code-wrapper img,
+  #qr-print-area .qr-code-wrapper img {
     display: block !important;
+
+    position: static !important;
 
     width: 220px !important;
     height: 220px !important;
 
-    max-width: none !important;
-    max-height: none !important;
+    min-width: 220px !important;
+    min-height: 220px !important;
+
+    max-width: 220px !important;
+    max-height: 220px !important;
 
     margin: 0 auto !important;
-  }
-
-  #student-qr-print .qr-code-wrapper img {
-    display: block !important;
-
-    width: 220px !important;
-    height: 220px !important;
-
-    max-width: none !important;
-    max-height: none !important;
-
-    margin: 0 auto !important;
+    padding: 0 !important;
 
     object-fit: contain !important;
+
+    visibility: visible !important;
+
+    overflow: visible !important;
   }
 
-  /*
-    Keep the student information visible.
-  */
-  #student-qr-print .student-qr-details {
+  /* =======================================================
+     STUDENT DETAILS
+     ======================================================= */
+
+  #student-qr-print .student-qr-details,
+  #qr-print-area .student-qr-details {
     display: block !important;
+
+    position: static !important;
+
     width: 100% !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 18px 0 0 !important;
 
     border-top: 1px solid #e5e7eb !important;
 
     overflow: visible !important;
+
+    visibility: visible !important;
+
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
-  #student-qr-print .student-detail {
+  #student-qr-print .student-qr-details h2,
+  #qr-print-area .student-qr-details h2 {
+    display: block !important;
+
+    margin: 0 0 15px !important;
+
+    color: #111827 !important;
+
+    font-size: 20px !important;
+
+    line-height: 1.25 !important;
+
+    visibility: visible !important;
+  }
+
+  /* =======================================================
+     DETAIL ROWS
+     ======================================================= */
+
+  #student-qr-print .student-detail,
+  #qr-print-area .student-detail {
     display: flex !important;
+
+    position: static !important;
+
+    align-items: center !important;
     justify-content: space-between !important;
 
     width: 100% !important;
 
+    height: auto !important;
+    min-height: 25px !important;
+
+    margin: 0 !important;
+    padding: 7px 0 !important;
+
+    border-bottom: 1px solid #f1f5f9 !important;
+
+    overflow: visible !important;
+
+    visibility: visible !important;
+  }
+
+  #student-qr-print .student-detail span,
+  #qr-print-area .student-detail span {
+    display: block !important;
+
+    color: #6b7280 !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.3 !important;
+
+    visibility: visible !important;
+  }
+
+  #student-qr-print .student-detail strong,
+  #qr-print-area .student-detail strong {
+    display: block !important;
+
+    color: #374151 !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.3 !important;
+
+    text-align: right !important;
+
+    word-break: break-word !important;
+
+    visibility: visible !important;
+  }
+
+  /* =======================================================
+     SCAN INSTRUCTION
+     ======================================================= */
+
+  #student-qr-print .scan-instruction,
+  #qr-print-area .scan-instruction {
+    display: block !important;
+
+    color: #6b7280 !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.3 !important;
+
+    margin: 18px 0 0 !important;
+    padding: 0 !important;
+
+    visibility: visible !important;
+  }
+
+  /* =======================================================
+     FINAL OVERFLOW RESET
+     ======================================================= */
+
+  #student-qr-print,
+  #student-qr-print *,
+  #qr-print-area,
+  #qr-print-area * {
     overflow: visible !important;
   }
 
   /*
-    Hide buttons and close button.
+     Keep the complete QR card together on one printed page.
   */
-  .qr-actions,
-  .close-qr-button {
-    display: none !important;
-  }
 
-  /*
-    Prevent the QR card from being split across pages.
-  */
-  #student-qr-print,
   #student-qr-print .qr-card,
-  #student-qr-print .qr-card-header,
-  #student-qr-print .qr-code-wrapper,
-  #student-qr-print .student-qr-details {
+  #qr-print-area .qr-card {
+    page-break-before: auto !important;
+    page-break-after: auto !important;
     page-break-inside: avoid !important;
+
+    break-before: auto !important;
+    break-after: auto !important;
     break-inside: avoid !important;
   }
 }

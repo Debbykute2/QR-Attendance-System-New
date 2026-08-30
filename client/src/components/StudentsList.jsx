@@ -26,7 +26,6 @@ function StudentsList() {
       }
 
       const data = await response.json()
-
       setStudents(data)
     } catch (err) {
       console.error(err)
@@ -63,6 +62,7 @@ function StudentsList() {
     <>
       <div className="page-panel">
 
+        {/* PAGE HEADER */}
         <div className="page-heading-row">
           <div className="page-heading">
             <h2>Students</h2>
@@ -74,12 +74,14 @@ function StudentsList() {
           </div>
         </div>
 
+        {/* ERROR */}
         {error && (
           <div className="error-message">
             {error}
           </div>
         )}
 
+        {/* SEARCH */}
         <div className="student-search">
           <input
             type="text"
@@ -89,6 +91,7 @@ function StudentsList() {
           />
         </div>
 
+        {/* STUDENT CONTENT */}
         {loading ? (
           <div className="table-empty">
             <span>⏳</span>
@@ -98,6 +101,7 @@ function StudentsList() {
         ) : filteredStudents.length === 0 ? (
           <div className="table-empty">
             <span>👥</span>
+
             <strong>
               {students.length === 0
                 ? 'No students registered yet'
@@ -128,15 +132,21 @@ function StudentsList() {
                 {filteredStudents.map((student) => (
                   <tr key={student.id || student.student_id}>
 
-                    <td>{student.student_id}</td>
+                    <td>
+                      {student.student_id}
+                    </td>
 
                     <td>
                       <strong>{student.name}</strong>
                     </td>
 
-                    <td>{student.email}</td>
+                    <td>
+                      {student.email}
+                    </td>
 
-                    <td>{student.department}</td>
+                    <td>
+                      {student.department}
+                    </td>
 
                     <td>
                       <button
@@ -154,10 +164,11 @@ function StudentsList() {
 
           </div>
         )}
-
       </div>
 
-      {/* QR MODAL */}
+      {/* =====================================================
+          QR VIEW MODAL
+          ===================================================== */}
 
       {selectedStudent && (
         <div
@@ -170,18 +181,25 @@ function StudentsList() {
             onClick={(e) => e.stopPropagation()}
           >
 
+            {/* CLOSE BUTTON */}
             <button
               className="close-qr-button"
               onClick={closeQR}
-              aria-label="Close"
+              aria-label="Close QR view"
             >
               ×
             </button>
+
+            {/* =================================================
+                PRINT AREA
+                Only this section should appear when printing.
+                ================================================= */}
 
             <div id="student-qr-print">
 
               <div className="qr-card">
 
+                {/* QR CARD HEADER */}
                 <div className="qr-card-header">
 
                   <div className="qr-logo">
@@ -195,25 +213,31 @@ function StudentsList() {
 
                 </div>
 
+                {/* QR CODE */}
                 <div className="qr-code-wrapper">
 
                   <QRCodeCanvas
                     value={JSON.stringify({
                       student_id: selectedStudent.student_id,
                       name: selectedStudent.name,
-   })}
-                  size={220}
-                  level="H"
-            />
+                    })}
+                    size={220}
+                    level="H"
+                    includeMargin={true}
+                  />
 
                 </div>
 
+                {/* STUDENT INFORMATION */}
                 <div className="student-qr-details">
 
-                  <h2>{selectedStudent.name}</h2>
+                  <h2>
+                    {selectedStudent.name}
+                  </h2>
 
                   <div className="student-detail">
                     <span>Student ID</span>
+
                     <strong>
                       {selectedStudent.student_id}
                     </strong>
@@ -221,6 +245,7 @@ function StudentsList() {
 
                   <div className="student-detail">
                     <span>Department</span>
+
                     <strong>
                       {selectedStudent.department}
                     </strong>
@@ -228,6 +253,7 @@ function StudentsList() {
 
                   <div className="student-detail">
                     <span>Email</span>
+
                     <strong>
                       {selectedStudent.email}
                     </strong>
@@ -242,6 +268,11 @@ function StudentsList() {
               </div>
 
             </div>
+
+            {/* =================================================
+                MODAL ACTIONS
+                These will NOT print.
+                ================================================= */}
 
             <div className="qr-actions">
 

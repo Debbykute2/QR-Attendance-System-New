@@ -23,6 +23,7 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     setError('')
     setLoading(true)
 
@@ -49,7 +50,9 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to register student.')
+        throw new Error(
+          data.message || 'Failed to register student.'
+        )
       }
 
       setRegisteredStudent(data.student)
@@ -57,9 +60,9 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
       if (onStudentRegistered) {
         onStudentRegistered(data.student)
       }
-    } catch (error) {
-      console.error('Registration error:', error)
-      setError(error.message || 'Failed to register student.')
+    } catch (err) {
+      console.error('Registration error:', err)
+      setError(err.message || 'Failed to register student.')
     } finally {
       setLoading(false)
     }
@@ -69,64 +72,129 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
     window.print()
   }
 
+  /*
+    ============================
+    PRINT / QR CARD PAGE
+    ============================
+  */
+
   if (registeredStudent) {
     return (
       <div className="page-panel">
-        <div className="success-message">
-          <div className="success-icon">✓</div>
+
+        <div className="success-message no-print">
+          <div className="success-icon">
+            ✓
+          </div>
 
           <div>
-            <h2>Student Registered Successfully!</h2>
+            <h2>
+              Student Registered Successfully!
+            </h2>
+
             <p>
               The student's QR code has been generated successfully.
             </p>
           </div>
         </div>
 
-        <div className="qr-card" id="qr-print-area">
-          <div className="qr-card-header">
-            <div className="qr-logo">QR</div>
+        {/* PRINT AREA */}
 
-            <div>
-              <h2>QR Attendance</h2>
-              <p>Student Attendance Card</p>
+        <div
+          id="qr-print-area"
+          className="qr-print-area"
+        >
+
+          <div className="qr-card">
+
+            <div className="qr-card-header">
+
+              <div className="qr-logo">
+                QR
+              </div>
+
+              <div>
+                <h2>
+                  QR Attendance
+                </h2>
+
+                <p>
+                  Student Attendance Card
+                </p>
+              </div>
+
             </div>
+
+            {/* QR CODE */}
+
+            <div className="qr-code-wrapper">
+
+              {registeredStudent.qr_code ? (
+                <img
+                  src={registeredStudent.qr_code}
+                  alt={`QR Code for ${registeredStudent.student_id}`}
+                  className="print-qr-image"
+                />
+              ) : (
+                <p>
+                  QR code unavailable.
+                </p>
+              )}
+
+            </div>
+
+            {/* STUDENT DETAILS */}
+
+            <div className="student-qr-details">
+
+              <h2>
+                {registeredStudent.name}
+              </h2>
+
+              <div className="student-detail">
+                <span>
+                  Student ID
+                </span>
+
+                <strong>
+                  {registeredStudent.student_id}
+                </strong>
+              </div>
+
+              <div className="student-detail">
+                <span>
+                  Department
+                </span>
+
+                <strong>
+                  {registeredStudent.department}
+                </strong>
+              </div>
+
+              <div className="student-detail">
+                <span>
+                  Email
+                </span>
+
+                <strong>
+                  {registeredStudent.email}
+                </strong>
+              </div>
+
+            </div>
+
+            <p className="scan-instruction">
+              Scan this QR code to record attendance.
+            </p>
+
           </div>
 
-          <div className="qr-code-wrapper">
-  <img
-    src={registeredStudent.qr_code}
-    alt={`QR Code for ${registeredStudent.student_id}`}
-    width="220"
-    height="220"
-  />
-</div>
-
-          <div className="student-qr-details">
-            <h2>{registeredStudent.name}</h2>
-
-            <div className="student-detail">
-              <span>Student ID</span>
-              <strong>{registeredStudent.student_id}</strong>
-            </div>
-
-            <div className="student-detail">
-              <span>Department</span>
-              <strong>{registeredStudent.department}</strong>
-            </div>
-
-            <div className="student-detail">
-              <span>Email</span>
-              <strong>{registeredStudent.email}</strong>
-            </div>
-          </div>
-
-          <p className="scan-instruction">
-            Scan this QR code to record attendance.
-          </p>
         </div>
 
-        <div className="qr-actions">
+        {/* BUTTONS */}
+
+        <div className="qr-actions no-print">
+
           <button
             className="secondary-button"
             onClick={onBack}
@@ -140,19 +208,32 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
           >
             🖨 Print QR Code
           </button>
+
         </div>
+
       </div>
     )
   }
 
+  /*
+    ============================
+    REGISTRATION FORM
+    ============================
+  */
+
   return (
     <div className="page-panel">
+
       <div className="page-heading">
-        <h2>Register New Student</h2>
+
+        <h2>
+          Register New Student
+        </h2>
 
         <p>
           Enter the student's information to create their attendance QR code.
         </p>
+
       </div>
 
       {error && (
@@ -165,8 +246,11 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
         className="student-form"
         onSubmit={handleSubmit}
       >
+
         <div className="form-grid">
+
           <div className="form-group">
+
             <label htmlFor="student_id">
               Student ID
             </label>
@@ -179,9 +263,11 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               value={formData.student_id}
               onChange={handleChange}
             />
+
           </div>
 
           <div className="form-group">
+
             <label htmlFor="name">
               Full Name
             </label>
@@ -194,9 +280,11 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               value={formData.name}
               onChange={handleChange}
             />
+
           </div>
 
           <div className="form-group">
+
             <label htmlFor="email">
               Email Address
             </label>
@@ -209,9 +297,11 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               value={formData.email}
               onChange={handleChange}
             />
+
           </div>
 
           <div className="form-group">
+
             <label htmlFor="department">
               Department
             </label>
@@ -224,10 +314,13 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               value={formData.department}
               onChange={handleChange}
             />
+
           </div>
+
         </div>
 
         <div className="form-actions">
+
           <button
             type="button"
             className="secondary-button"
@@ -245,8 +338,11 @@ function RegisterStudent({ onStudentRegistered, onBack }) {
               ? 'Registering...'
               : 'Generate QR & Register'}
           </button>
+
         </div>
+
       </form>
+
     </div>
   )
 }
