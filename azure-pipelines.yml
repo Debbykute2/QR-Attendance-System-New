@@ -29,33 +29,37 @@ steps:
   displayName: 'Install and build React frontend'
 
 # =========================
-# BACKEND + API TESTS
+# BACKEND
 # =========================
 - script: |
     cd server
     npm ci
+  displayName: 'Install backend dependencies'
+
+# =========================
+# RUN API TESTS
+# =========================
+- script: |
+    cd server
     npm test
-  displayName: 'Install dependencies and run API tests'
+  displayName: 'Run automated API tests'
 
 # =========================
 # API HEALTH CHECK
 # =========================
 - script: |
-    echo "Checking QR Attendance API..."
     curl --fail https://qr-attendance-server-b77n.onrender.com/api/test
-    echo ""
-    echo "API health check passed."
   displayName: 'Check live API health'
 
 # =========================
-# VERIFY PROJECT
+# VERIFY PIPELINE
 # =========================
 - script: |
     echo "======================================"
-    echo "QR ATTENDANCE SYSTEM CI PASSED"
+    echo "QR Attendance System CI completed"
+    echo "Frontend build: SUCCESS"
+    echo "Backend dependencies: SUCCESS"
+    echo "Automated API tests: SUCCESS"
+    echo "Live API health check: SUCCESS"
     echo "======================================"
-    echo "Frontend build completed."
-    echo "Backend dependencies installed."
-    echo "Automated API tests passed."
-    echo "Live API health check passed."
   displayName: 'Verify CI pipeline'
