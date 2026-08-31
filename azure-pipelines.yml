@@ -37,10 +37,35 @@ steps:
   displayName: 'Install backend dependencies'
 
 # =========================
+# API HEALTH CHECK
+# =========================
+- script: |
+    echo "Checking QR Attendance API..."
+
+    API_URL="https://qr-attendance-server-b77n.onrender.com/api/test"
+
+    echo "Testing: $API_URL"
+
+    RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL")
+
+    echo "API response status: $RESPONSE"
+
+    if [ "$RESPONSE" -ne 200 ]; then
+      echo "API health check failed."
+      exit 1
+    fi
+
+    echo "API health check passed successfully."
+  displayName: 'Check deployed API health'
+
+# =========================
 # VERIFY PROJECT
 # =========================
 - script: |
-    echo "QR Attendance System CI pipeline completed successfully."
-    echo "Frontend build completed."
-    echo "Backend dependencies installed."
+    echo "===================================="
+    echo "QR ATTENDANCE SYSTEM CI PASSED"
+    echo "===================================="
+    echo "Frontend build completed successfully."
+    echo "Backend dependencies installed successfully."
+    echo "Deployed API is responding successfully."
   displayName: 'Verify CI pipeline'
