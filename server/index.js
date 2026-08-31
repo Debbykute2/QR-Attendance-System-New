@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const { pool, initializeDatabase } = require("./database/db");
+const { initializeDatabase } = require("./database/db");
 const studentRoutes = require("./routes/students");
 const attendanceRoutes = require("./routes/attendance");
 
@@ -29,12 +29,17 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-async function startServer() {
-  await initializeDatabase();
+// Only start the server when index.js is run directly
+if (require.main === module) {
+  async function startServer() {
+    await initializeDatabase();
 
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
+
+  startServer();
 }
 
-startServer();
+module.exports = app;
