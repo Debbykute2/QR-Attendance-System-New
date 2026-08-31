@@ -14,9 +14,9 @@ steps:
 # =========================
 # USE NODE.JS
 # =========================
-- task: NodeTool@0
+- task: UseNode@1
   inputs:
-    versionSpec: '20.x'
+    version: '20.x'
   displayName: 'Install Node.js'
 
 # =========================
